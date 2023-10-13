@@ -7,8 +7,7 @@ class Episodio():
 
     @property
     def duracao(self):
-        if self.__duracao is not None:
-            return self.__duracao
+        return self.__duracao
 
     @duracao.setter
     def duracao(self, duracao: int):

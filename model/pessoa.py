@@ -1,8 +1,8 @@
-from midia import Midia
+from model.midia import Midia
 
 
 class Pessoa():
-    def __init__(self, nome: str, email: str, midia_fav: Midia):
+    def __init__(self, nome: str, email: str, midia_fav: Midia = None):
         if isinstance(nome, str):
             self.__nome = nome
 
@@ -11,13 +11,13 @@ class Pessoa():
 
         if isinstance(midia_fav, Midia):
             self.__midia_fav = midia_fav
-        elif isinstance(midia_fav, None):
+        elif midia_fav is None:
+            self.__midia_fav = None
             print("Usuário escolheu deixar Mídia Favorita como vazia")
 
     @property
     def nome(self):
-        if self.__nome is not None:
-            return self.__nome
+        return self.__nome
 
     @nome.setter
     def nome(self, nome):
@@ -26,8 +26,7 @@ class Pessoa():
 
     @property
     def email(self):
-        if self.__email is not None:
-            return self.__email
+        return self.__email
 
     @email.setter
     def email(self, email):
@@ -37,7 +36,9 @@ class Pessoa():
     @property
     def midia_fav(self):
         if self.__midia_fav is not None:
-            return self.__midia_fav
+            return type(self.__midia_fav).__name__
+        elif self.__midia_fav is None:
+            return "Nenhuma"
 
     @midia_fav.setter
     def midia_fav(self, midia_fav):

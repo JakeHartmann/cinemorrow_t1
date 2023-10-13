@@ -9,8 +9,7 @@ class Midia(ABC):
         
     @property
     def titulo(self):
-        if self.__titulo is not None:
-            return self.__titulo
+        return self.__titulo
 
     @titulo.setter
     def titulo(self, titulo):

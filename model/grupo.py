@@ -23,8 +23,7 @@ class Grupo():
 
 	@property
 	def titulo(self):
-		if self.__titulo is not None:
-			return self.__titulo
+		return self.__titulo
 
 	@titulo.setter
 	def titulo(self, titulo):
@@ -33,13 +32,11 @@ class Grupo():
 
 	@property
 	def pessoas(self):
-		if self.__pessoas:
-			return self.__pessoas
+		return self.__pessoas
 
 	@property
 	def midia_associada(self):
-		if self.__midia_associada is not None:
-			return self.__midia_associada
+		return self.__midia_associada
 
 	@midia_associada.setter
 	def midia_associada(self, midia_associada):
@@ -48,8 +45,7 @@ class Grupo():
 
 	@property
 	def data(self):
-		if self.__data is not None:
-			return self.__data
+		return self.__data
 
 	@data.setter
 	def data(self, data):

@@ -1,5 +1,0 @@
-professor, caso esteja lendo isso, queria dizer que só fui me tocar agora que tava commitando desse tal de "BuildTools"
-depois de pensar um pouco, percebi que se tratava de uns comandos envolvendo umas builds que fiz de servidores de minecraft um tempão atrás KKKKKKKK
-confesso que tenho medo de usar a função de rebase pra modificar o autor dos commits então vou deixar desse jeito caso não haja problema
-
-ah e, o commit "Create README.md" que eu fiz no meu nome tudo certinho mesmo, foi porque eu criei o README direto do site do github, invés de dar commit da minha máquina

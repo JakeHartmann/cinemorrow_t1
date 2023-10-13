@@ -18,16 +18,16 @@ class Pessoa():
     def nome(self):
         if self.__nome is not None:
             return self.__nome
-    
+
     def nome(self, nome):
         if isinstance(nome, str):
             self.__nome = nome
-    
+
     @property
     def email(self):
         if self.__email is not None:
             return self.__email
-    
+
     def email(self, email):
         if isinstance(email, str):
             self.__email = email
@@ -36,7 +36,7 @@ class Pessoa():
     def midia_fav(self):
         if self.__midia_fav is not None:
             return self.__midia_fav
-        
+
     def midia_fav(self, midia_fav):
         if isinstance(midia_fav, Midia):
             self.__midia_fav = midia_fav

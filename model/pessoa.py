@@ -19,6 +19,7 @@ class Pessoa():
         if self.__nome is not None:
             return self.__nome
 
+    @nome.setter
     def nome(self, nome):
         if isinstance(nome, str):
             self.__nome = nome
@@ -28,6 +29,7 @@ class Pessoa():
         if self.__email is not None:
             return self.__email
 
+    @email.setter
     def email(self, email):
         if isinstance(email, str):
             self.__email = email
@@ -37,6 +39,7 @@ class Pessoa():
         if self.__midia_fav is not None:
             return self.__midia_fav
 
+    @midia_fav.setter
     def midia_fav(self, midia_fav):
         if isinstance(midia_fav, Midia):
             self.__midia_fav = midia_fav

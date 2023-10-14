@@ -13,7 +13,6 @@ class Pessoa():
             self.__midia_fav = midia_fav
         elif midia_fav is None:
             self.__midia_fav = None
-            print("Usuário escolheu deixar Mídia Favorita como vazia")
 
     @property
     def nome(self):

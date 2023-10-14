@@ -1,6 +1,6 @@
-from midia import Midia
+from model.midia import Midia
 from datetime import datetime
-from pessoa import Pessoa
+from model.pessoa import Pessoa
 
 
 class Grupo():

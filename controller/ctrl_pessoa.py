@@ -9,11 +9,11 @@ class CtrlPessoa():
 
         self.__tela_pessoa = TelaPessoa()
 
-        self.__pessoas = []
+        self.pessoas = []
 
-    @property
-    def pessoas(self):
-        return self.__pessoas
+    # @property
+    # def pessoas(self):
+    #     return self.__pessoas
 
     def abre_tela(self):
         self.__tela_pessoa.mostra_opcoes(titulo=" "*3+"Gerencia de Pessoas", spacing=""+"-="*12+"-", opcoes="""
@@ -43,8 +43,8 @@ class CtrlPessoa():
             nome = self.__tela_pessoa.recebe_input_str("Digite o nome da pessoa: ")
             email = self.__tela_pessoa.recebe_input_str(f"Digite o email de '{nome}': ")
         
-            if self.__pessoas:
-                for pessoa in self.__pessoas:
+            if self.pessoas:
+                for pessoa in self.pessoas:
                     if pessoa.email == email:
                         print("Esse email já está sendo utilizado.")
                         self.standby()
@@ -64,7 +64,7 @@ Escolha o tipo de mídia favorito de '{nome}': """, [1, 2])
             else:
                 midia_fav = None
                 
-            self.__pessoas.append(Pessoa(nome, email, midia_fav))
+            self.pessoas.append(Pessoa(nome, email, midia_fav))
             print(f"'{nome}' foi adicionado(a) com sucesso.")
             self.standby()
             
@@ -73,38 +73,46 @@ Escolha o tipo de mídia favorito de '{nome}': """, [1, 2])
 
     def remove_pessoa(self):
         self.__tela_pessoa.mostra_opcoes(titulo=" "*3+"Remoção de Pessoa", spacing=""+"-="*11+"-")
-        if self.__pessoas:
+        
+        if self.pessoas:
             # confirmacao = self.__tela_pessoa.recebe_input_sn("Deseja remover uma pessoa? (S/N): ")
-            for (i, pessoa) in enumerate(self.__pessoas, start=1):
+            for (i, pessoa) in enumerate(self.pessoas, start=1):
                 print(f"[{i}] - {pessoa.nome} (E-Mail: {pessoa.email})")
             print("0 para retornar")
-            validos = list(range(1, len(self.__pessoas) + 1)) + [0]
+            validos = list(range(1, len(self.pessoas) + 1)) + [0]
             
             opcao = self.__tela_pessoa.recebe_input_int("\nEscolha o índice associado à pessoa para removê-la: ", validos)
             if opcao == 0:
                 self.abre_tela()
             else:
-                pessoa_escolhida = self.__pessoas[opcao - 1]
-                print(f"A pessoa '{pessoa_escolhida.nome}' com o E-Mail '{pessoa_escolhida.email}' foi removida com sucesso.")
-                self.__pessoas.remove(pessoa_escolhida)
-                self.standby()
+                pessoa_escolhida = self.pessoas[opcao - 1]
+                
+                pessoa_em_grupo = any(pessoa_escolhida in grupo.pessoas for grupo in self.__ctrl_principal.ctrl_grupo.grupos)
+                
+                if pessoa_em_grupo:
+                    print(f"Não é possível excluir a pessoa '{pessoa_escolhida.nome}' pois ela é membro de um grupo.")
+                else:
+                    print(f"A pessoa '{pessoa_escolhida.nome}' com o E-Mail '{pessoa_escolhida.email}' foi removida com sucesso.")
+                    self.pessoas.remove(pessoa_escolhida)
+                    
         else:
             print("Opa, parece que não há nenhuma pessoa cadastrada.")
-            self.standby()
+        
+        self.standby()
 
     def altera_pessoa(self):
         self.__tela_pessoa.mostra_opcoes(titulo=" "*3+"Alteração de Pessoa", spacing="-="*12)
-        if self.__pessoas:
-            for (i, pessoa) in enumerate(self.__pessoas, start=1):
+        if self.pessoas:
+            for (i, pessoa) in enumerate(self.pessoas, start=1):
                 print(f"[{i}] - {pessoa.nome} (E-Mail: {pessoa.email}; Tipo de Midia Favorita: {pessoa.midia_fav})")
             print("0 para retornar")
-            validos = list(range(1, len(self.__pessoas) + 1)) + [0]
+            validos = list(range(1, len(self.pessoas) + 1)) + [0]
             
             opcao = self.__tela_pessoa.recebe_input_int("\nEscolha o índice associado à pessoa para alterá-la: ", validos)
             if opcao == 0:
                 self.abre_tela()
             else:
-                pessoa_escolhida = self.__pessoas[opcao - 1]
+                pessoa_escolhida = self.pessoas[opcao - 1]
                 
                 quer_alterar_nome = self.__tela_pessoa.recebe_input_sn(f"Deseja alterar o nome de '{pessoa_escolhida.nome}'? (S/N): ")
                 if quer_alterar_nome:
@@ -143,10 +151,10 @@ Escolha o novo tipo de mídia favorito de '{pessoa_escolhida.nome}': """, [1, 2,
 
     def lista_pessoas(self):
         self.__tela_pessoa.mostra_opcoes(titulo=" "*3+"Listagem de Pessoas", spacing="="+"-="*12)
-        if self.__pessoas:
+        if self.pessoas:
             confirmacao = self.__tela_pessoa.recebe_input_sn("Deseja listar todas as pessoas cadastradas? (S/N): ")
             if confirmacao:
-                for pessoa in self.__pessoas:
+                for pessoa in self.pessoas:
                     print(f"""
 Nome: {pessoa.nome}
 E-Mail: {pessoa.email}

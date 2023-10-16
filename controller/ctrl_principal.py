@@ -163,20 +163,6 @@ class CtrlPrincipal():
             grupo.midia_associada for grupo in self.ctrl_grupo.grupos if grupo.midia_associada]
 
         if midias_associadas:
-            tipo_midia_mais_vista, quantidade = Counter(
-                midias_associadas).most_common(1)[0]
-            print(
-                f"A mídia mais assistida é: {type(tipo_midia_mais_vista).__name__}, Quantidade: {quantidade}")
-        else:
-            print("Sem informações disponíveis.")
-
-        self.standby()
-
-    def tipo_de_midia_mais_assistida(self):
-        midias_associadas = [
-            grupo.midia_associada for grupo in self.ctrl_grupo.grupos if grupo.midia_associada]
-
-        if midias_associadas:
             midias_mais_vistas = Counter(midias_associadas).most_common()
             tipo_midia_mais_vista, quantidade = midias_mais_vistas[0]
 

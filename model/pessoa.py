@@ -2,7 +2,7 @@ from model.midia import Midia
 
 
 class Pessoa():
-    def __init__(self, nome: str, email: str, midia_fav = None):
+    def __init__(self, nome: str, email: str, midia_fav=None):
         if isinstance(nome, str):
             self.__nome = nome
 

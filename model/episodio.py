@@ -11,6 +11,7 @@ class Episodio():
     @property
     def numero(self):
         return self.__numero
+
     @numero.setter
     def numero(self, numero):
         if isinstance(numero, int):
@@ -27,6 +28,7 @@ class Episodio():
     @property
     def assistido(self):
         return self.__assistido
+
     @assistido.setter
     def assistido(self, assistido):
         if isinstance(assistido, bool):

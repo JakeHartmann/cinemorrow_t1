@@ -32,12 +32,12 @@ class CtrlMidia():
             3: self.altera_midia,
             4: self.lista_midias,
             5: self.retorna
-            }
+        }
 
         while True:
             opcao = self.__tela_midia.recebe_input_int(
                 "Escolha uma opção (midias): ", [1, 2, 3, 4, 5])
-            
+
             escolha = lista_opcoes[opcao]
             escolha()
 
@@ -50,7 +50,7 @@ class CtrlMidia():
             1: self.criar_filme,
             2: self.criar_serie,
             3: self.abre_tela
-            }
+        }
 
         lista_opcoes[self.__tela_midia.recebe_input_int("""
     1 - Filme
@@ -58,7 +58,6 @@ class CtrlMidia():
     3 - Voltar
     
 Escolha uma opção (criar mídia): """, [1, 2, 3])]()
-
 
     def criar_filme(self):
         titulo = self.__tela_midia.recebe_input_str(
@@ -96,19 +95,19 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
         os.system('cls||clear')
         print(" " * 3 + "Remoção de Mídia")
         print("" + "-=" * 11)
-        
+
         if not (self.filmes or self.series):
             print("Opa, parece que não há nem filmes e nem séries cadastrados.")
             self.standby()
 
         lista_opcoes = {}
         opcao = 1
-        
+
         if self.filmes:
             lista_opcoes[opcao] = self.remove_filme
             print(f"\n    {opcao} - Filme")
             opcao += 1
-            
+
         if self.series:
             lista_opcoes[opcao] = self.remove_serie
             print(f"    {opcao} - Série")
@@ -117,7 +116,8 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
         lista_opcoes[opcao] = self.abre_tela
         print(f"    {opcao} - Voltar")
 
-        opcao_escolhida = self.__tela_midia.recebe_input_int("\nEscolha o tipo de mídia a ser removido: ", range(1, opcao + 1))
+        opcao_escolhida = self.__tela_midia.recebe_input_int(
+            "\nEscolha o tipo de mídia a ser removido: ", range(1, opcao + 1))
         if opcao_escolhida in lista_opcoes:
             escolha_tipo_midia = lista_opcoes[opcao_escolhida]
             escolha_tipo_midia()
@@ -128,16 +128,16 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
         os.system('cls||clear')
         print(" "*3+"Remoção de Filmes")
         print(""+"-="*11)
-        
+
         for (i, filme) in enumerate(self.filmes, start=1):
             print(f"[{i}] - {filme.titulo}")
-        
+
         print("0 para retornar")
         validos = list(range(1, len(self.filmes) + 1)) + [0]
 
         opcao = self.__tela_midia.recebe_input_int(
             "\nEscolha o índice associado ao filme para removê-lo: ", validos)
-        
+
         if opcao == 0:
             self.abre_tela()
         else:
@@ -151,16 +151,16 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
         os.system('cls||clear')
         print(" "*3+"Remoção de Séries")
         print(""+"-="*11)
-        
+
         for (i, serie) in enumerate(self.series, start=1):
             print(f"[{i}] - {serie.titulo}")
-            
+
         print("0 para retornar")
         validos = list(range(1, len(self.series) + 1)) + [0]
 
         opcao = self.__tela_midia.recebe_input_int(
             "\nEscolha o índice associado à série para removê-la: ", validos)
-        
+
         if opcao == 0:
             self.abre_tela()
         else:
@@ -196,12 +196,13 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
         lista_opcoes[opcao] = self.abre_tela
         print(f"    {opcao} - Voltar")
 
-        opcao_escolhida = self.__tela_midia.recebe_input_int("\nEscolha o tipo de mídia a ser alterado: ", range(1, opcao + 1))
-        
+        opcao_escolhida = self.__tela_midia.recebe_input_int(
+            "\nEscolha o tipo de mídia a ser alterado: ", range(1, opcao + 1))
+
         if opcao_escolhida in lista_opcoes:
             escolha_tipo_midia = lista_opcoes[opcao_escolhida]
             escolha_tipo_midia()
-        else: 
+        else:
             self.abre_tela()
 
     def altera_filme(self):
@@ -272,12 +273,12 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
         print(""+"-="*12)
 
         if self.series or self.filmes:
-            
+
             lista_opcoes = {
                 1: self.lista_filmes,
                 2: self.lista_series,
                 3: self.abre_tela
-                }
+            }
 
             opcao = self.__tela_midia.recebe_input_int("""
     1 - Filmes

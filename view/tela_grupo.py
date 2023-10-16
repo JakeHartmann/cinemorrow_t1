@@ -17,10 +17,9 @@ class TelaGrupo(AbstractTela):
                     if 0 <= hora <= 23 and 0 <= minutos <= 59:
                         return hora, minutos
                     else:
-                            print("Por favor, insira uma hora válida (0-23) e minutos válidos (0-59).")
+                        print(
+                            "Por favor, insira uma hora válida (0-23) e minutos válidos (0-59).")
                 else:
                     print("Formato inválido. Use HH:MM.")
             except ValueError:
                 print("Entrada inválida. Use HH:MM.")
-
-    

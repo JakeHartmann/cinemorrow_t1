@@ -14,6 +14,15 @@ class AbstractTela(ABC):
 
         print(opcoes)
 
+    def imprime_opcoes(self, titulo=""):
+        os.system('cls||clear')
+        spacing = 5
+        print(" " * spacing + titulo)
+        print("" + "-=" * self.calcula_tracos(titulo, spacing))
+
+    def calcula_tracos(self, titulo, spacing):
+        return max(1, (len(titulo) + 2 * spacing) // 2)
+
     def recebe_input_int(self, mensagem: str = "", inteiros_validos: [] = None, limite: int = None):
         while True:
             valor_lido = input(mensagem)

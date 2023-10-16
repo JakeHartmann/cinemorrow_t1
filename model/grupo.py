@@ -5,11 +5,11 @@ from model.pessoa import Pessoa
 
 class Grupo():
 
-	def __init__(self, titulo: str, integrante: Pessoa, midia_associada: Midia, data: datetime):
+	def __init__(self, nome: str, integrante: Pessoa, midia_associada: Midia, data: datetime):
 		self.__pessoas = []
 
-		if isinstance(titulo, str):
-			self.__titulo = titulo
+		if isinstance(nome, str):
+			self.__nome = nome
 
 		if isinstance(integrante, Pessoa):
 			self.__integrante = integrante
@@ -22,13 +22,13 @@ class Grupo():
 			self.__data = data
 
 	@property
-	def titulo(self):
-		return self.__titulo
+	def nome(self):
+		return self.__nome
 
-	@titulo.setter
-	def titulo(self, titulo):
-		if isinstance(titulo, str):
-			self.__titulo = titulo
+	@nome.setter
+	def nome(self, nome):
+		if isinstance(nome, str):
+			self.__nome = nome
 
 	@property
 	def pessoas(self):
@@ -38,10 +38,10 @@ class Grupo():
 	def midia_associada(self):
 		return self.__midia_associada
 
-	@midia_associada.setter
-	def midia_associada(self, midia_associada):
-		if isinstance(midia_associada, Midia):
-			self.__midia_associada = midia_associada
+	# @midia_associada.setter
+	# def midia_associada(self, midia_associada):
+	# 	if isinstance(midia_associada, Midia):
+	# 		self.__midia_associada = midia_associada
 
 	@property
 	def data(self):

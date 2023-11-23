@@ -64,17 +64,17 @@ class CtrlPrincipal():
             mais_comuns = contagem_midias.most_common()
 
             if len(mais_comuns) > 1 and mais_comuns[0][1] == mais_comuns[1][1]:
-                print("Empate! Os tipos de mídia favoritos mais comuns são: ")
+                self.tela_principal.output_texto("Empate! Os tipos de mídia favoritos mais comuns são: ")
                 for midia, quantidade in mais_comuns:
-                    print(f"{midia}: Quantidade: {quantidade}")
+                    self.tela_principal.output_texto(f"{midia}: Quantidade: {quantidade}")
 
             else:
                 tipo_midia_mais_comum, quantidade = mais_comuns[0]
-                print(
+                self.tela_principal.output_texto(
                     f"O tipo de midia favorita mais comum é: {tipo_midia_mais_comum}, Quantidade: {quantidade}")
 
         else:
-            print("Sem informações disponíveis.")
+            self.tela_principal.output_texto("Sem informações disponíveis.")
 
         self.standby()
 
@@ -89,19 +89,19 @@ class CtrlPrincipal():
                 ) if quantidade == quantidade_max]
                 if len(pessoas_empate) == 1:
                     pessoa_mais_comum = pessoas_empate[0]
-                    print(
+                    self.tela_principal.output_texto(
                         f"A pessoa no maior número de grupos é: {pessoa_mais_comum.nome}, Quantidade de grupos: {quantidade_max}")
                 else:
-                    print(
+                    self.tela_principal.output_texto(
                         "Empate! Pessoas com o mesmo número de ocorrência em grupos: ")
                     for pessoa in pessoas_empate:
-                        print(f"- {pessoa.nome}")
+                        self.tela_principal.output_texto(f"- {pessoa.nome}")
 
             else:
-                print("Nenhuma pessoa em grupos.")
+                self.tela_principal.output_texto("Nenhuma pessoa em grupos.")
 
         else:
-            print("Sem grupos disponíveis.")
+            self.tela_principal.output_texto("Sem grupos disponíveis.")
 
         self.standby()
 
@@ -118,18 +118,18 @@ class CtrlPrincipal():
                 if len(grupos_tie) == 1:
                     grupo_mais_pessoas = grupos_tie[0]
                     quantidade_pessoas = len(grupo_mais_pessoas.pessoas)
-                    print(
+                    self.tela_principal.output_texto(
                         f"O grupo com mais pessoas é: {grupo_mais_pessoas.nome}, Quantidade: {quantidade_pessoas} pessoa(s)")
                 else:
-                    print(
+                    self.tela_principal.output_texto(
                         f"Empate! Grupos com o mesmo número de pessoas ({max_quantidade}):")
                     for grupo in grupos_tie:
                         quantidade_pessoas = len(grupo.pessoas)
-                        print(f"- {grupo.nome} ({quantidade_pessoas} pessoas)")
+                        self.tela_principal.output_texto(f"- {grupo.nome} ({quantidade_pessoas} pessoas)")
             else:
-                print("Sem informações disponíveis.")
+                self.tela_principal.output_texto("Sem informações disponíveis.")
         else:
-            print("Sem grupos disponíveis.")
+            self.tela_principal.output_texto("Sem grupos disponíveis.")
 
         self.standby()
 
@@ -170,20 +170,38 @@ class CtrlPrincipal():
                 midia for midia, quantidade in midias_mais_vistas[1:] if quantidade == quantidade]
 
             if len(empate_midias) == 0:
-                print(
+                self.tela_principal.output_texto(
                     f"O tipo de mídia mais visto é: {tipo_midia_mais_vista.titulo}, Quantidade: {quantidade}")
             else:
-                print(
+                self.tela_principal.output_texto(
                     f"Empate! Tipos de mídia com a mesma quantidade de visualizações ({quantidade}):")
                 for midia in [tipo_midia_mais_vista] + empate_midias:
-                    print(f"- {midia.titulo}")
+                    self.tela_principal.output_texto(f"- {midia.titulo}")
         else:
-            print("Sem informações disponíveis.")
+            self.tela_principal.output_texto("Sem informações disponíveis.")
 
         self.standby()
 
     def abre_tela(self):
-        self.tela_principal.mostra_opcoes()
+        os.system('cls||clear')
+        logo = '''
+  ####     ####    ##  ##   ######   ##   ##   ####    ######   ######   ######   ##   ## 
+ ##  ##     ##     ### ##   ##       ### ###  ##  ##   ##  ##   ##  ##   ##  ##   ##   ## 
+ ##         ##     ######   ##       #######  ##  ##   ##  ##   ##  ##   ##  ##   ##   ## 
+ ##         ##     ######   ####     ## # ##  ##  ##   #####    #####    ##  ##   ## # ## 
+ ##         ##     ## ###   ##       ##   ##  ##  ##   ####     ####     ##  ##   ####### 
+ ##  ##     ##     ##  ##   ##       ##   ##  ##  ##   ## ##    ## ##    ##  ##   ### ### 
+  ####     ####    ##  ##   ######   ##   ##   ####    ##  ##   ##  ##    ####    ##   ## 
+        '''
+        opcoes = """
+    1 - Gerenciar Mídias
+    2 - Gerenciar Pessoas
+    3 - Gerenciar Grupos
+    4 - Relatórios
+    5 - Encerrar
+              """
+        self.tela_principal.output_texto(logo)
+        self.tela_principal.output_texto(opcoes)
 
         lista_opcoes = {
             1: self.gerencia_midia,
@@ -215,7 +233,7 @@ class CtrlPrincipal():
         return pessoa in grupo.pessoas
 
     def standby(self):
-        print("\nAperte qualquer tecla para retornar ao menu principal.")
+        self.tela_principal.output_texto("\nAperte qualquer tecla para retornar ao menu principal.")
         input()
         self.abre_tela()
 

@@ -6,22 +6,9 @@ class AbstractTela(ABC):
     @abstractmethod
     def __init__(self):
         pass
-
-    def mostra_opcoes(self, titulo="", spacing="", opcoes=""):
-        os.system('cls||clear')
-        print(titulo)
-        print(spacing)
-
-        print(opcoes)
-
-    def imprime_opcoes(self, titulo=""):
-        os.system('cls||clear')
-        spacing = 5
-        print(" " * spacing + titulo)
-        print("" + "-=" * self.calcula_tracos(titulo, spacing))
-
-    def calcula_tracos(self, titulo, spacing):
-        return max(1, (len(titulo) + 2 * spacing) // 2)
+        
+    def output_texto(self, texto):
+        print(texto)
 
     def recebe_input_int(self, mensagem: str = "", inteiros_validos: [] = None, limite: int = None):
         while True:

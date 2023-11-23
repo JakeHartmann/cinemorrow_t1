@@ -1,3 +1,4 @@
 .vscode/settings.json
 teste.py
 *.pyc
+.VSCodeCounter

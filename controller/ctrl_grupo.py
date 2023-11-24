@@ -3,6 +3,7 @@ from model.grupo import Grupo
 from model.serie import Serie
 from model.temporada import Temporada
 from model.episodio import Episodio
+from model.progresso import Progresso
 from datetime import datetime
 import os
 import copy
@@ -60,7 +61,7 @@ class CtrlGrupo():
                 nome = self.__tela_grupo.recebe_input_str(
                     "Digite o nome do grupo: ")
 
-                self.__tela_grupo.output_texto()
+                self.__tela_grupo.output_texto("")
                 # Lista todas as pessoas instanciadas, junto com o nome e o email de cada uma
                 for (i, pessoa) in enumerate(self.__ctrl_principal.ctrl_pessoa.pessoas, start=1):
                     self.__tela_grupo.output_texto(f"[{i}] - {pessoa.nome} (E-Mail: {pessoa.email})")
@@ -79,7 +80,7 @@ class CtrlGrupo():
                 # Lista todas as mídias instanciadas, separadas em filmes e séries
                 todas_midias = [*self.__ctrl_principal.ctrl_midia.filmes,
                                 *self.__ctrl_principal.ctrl_midia.series]
-                self.__tela_grupo.output_texto()
+                self.__tela_grupo.output_texto("")
                 for (i, midia) in enumerate(todas_midias, start=1):
                     self.__tela_grupo.output_texto(f"[{i}] - {midia.titulo} ({type(midia).__name__})")
                 midias_validas = list(range(1, len(todas_midias) + 1)) + [0]
@@ -89,8 +90,7 @@ class CtrlGrupo():
                 if opcao_midia == 0:
                     self.abre_tela()
                 else:
-                    midia_escolhida = copy.deepcopy(
-                        todas_midias[opcao_midia - 1])
+                    midia_escolhida = todas_midias[opcao_midia - 1]
 
                     self.__tela_grupo.output_texto(
                         f"'{midia_escolhida.titulo}' foi escolhida como a mídia associada do grupo.")
@@ -104,8 +104,10 @@ class CtrlGrupo():
                 hora, minutos = self.__tela_grupo.recebe_input_hora_minutos(
                     "Digite a hora e minutos (formato: HH:MM): ")
 
-                self.__grupos.append(Grupo(nome, pessoa_escolhida, midia_escolhida, datetime(
-                    ano, mes, dia, hora, minutos)))
+                grupo = Grupo(nome, pessoa_escolhida, midia_escolhida, datetime(ano, mes, dia, hora, minutos))
+                if isinstance(midia_escolhida, Serie):
+                    progresso = Progresso(midia_escolhida, grupo)
+                self.__grupos.append(grupo)
                 self.__tela_grupo.output_texto(f"Grupo '{nome}' foi criado com sucesso")
 
         else:
@@ -176,8 +178,8 @@ class CtrlGrupo():
                     f"    Data da Próxima Sessão: {grupo.data.strftime('%Y-%m-%d %H:%M')}")
                 self.__tela_grupo.output_texto("    Membros:")
                 for membro in grupo.pessoas:
-                    self.__tela_grupo(f"        {membro.nome}")
-            self.__tela_grupo.output_texto()
+                    self.__tela_grupo.output_texto(f"        {membro.nome}")
+            self.__tela_grupo.output_texto("")
             self.__tela_grupo.output_texto("0 para retornar")
             validos = list(range(1, len(self.__grupos) + 1)) + [0]
             opcao_grupo = self.__tela_grupo.recebe_input_int(
@@ -282,7 +284,7 @@ Escolha a opção de alteração: """, [1, 2, 3, 4, 5, 6])
             self.__tela_grupo.output_texto("Pessoas Disponíveis:")
             for (i, pessoa) in enumerate(pessoas_disponiveis, start=1):
                 self.__tela_grupo.output_texto(f"[{i}] - Nome: {pessoa.nome} (E-Mail: {pessoa.email})")
-            self.__tela_grupo.output_texto()
+            self.__tela_grupo.output_texto("")
 
             opcao_pessoa = self.__tela_grupo.recebe_input_int(
                 "\nEscolha o índice associado a uma pessoa para adicioná-la ao grupo: ", list(range(1, len(pessoas_disponiveis) + 1)))
@@ -307,7 +309,7 @@ Escolha a opção de alteração: """, [1, 2, 3, 4, 5, 6])
             self.__tela_grupo.output_texto("Membros do Grupo:")
             for (i, pessoa) in enumerate(grupo.pessoas, start=1):
                 self.__tela_grupo.output_texto(f"[{i}] - Nome: {pessoa.nome} (E-Mail: {pessoa.email})")
-            self.__tela_grupo.output_texto()
+            self.__tela_grupo.output_texto("")
 
             opcao_pessoa = self.__tela_grupo.recebe_input_int(
                 "\nEscolha o índice associado a um membro para removê-lo do grupo: ", list(range(1, len(grupo.pessoas) + 1)))
@@ -329,7 +331,7 @@ Escolha a opção de alteração: """, [1, 2, 3, 4, 5, 6])
                 "Deseja listar todos os grupos? (S/N): ")
             if confirmacao:
                 for grupo in self.__grupos:
-                    self.__tela_grupo.output_texto()
+                    self.__tela_grupo.output_texto("")
                     self.__tela_grupo.output_texto("-"*30)
                     self.__tela_grupo.output_texto(f"Nome do Grupo: {grupo.nome}")
                     self.__tela_grupo.output_texto(
@@ -355,7 +357,7 @@ Escolha a opção de alteração: """, [1, 2, 3, 4, 5, 6])
 
                     self.__tela_grupo.output_texto(
                         f"Midia associada ao Grupo: {grupo.midia_associada.titulo} ({type(grupo.midia_associada).__name__})")
-            self.__tela_grupo.output_texto()
+            self.__tela_grupo.output_texto("")
 
         else:
             self.__tela_grupo.output_texto("Opa, parece que não há nenhum grupo cadastrado.")

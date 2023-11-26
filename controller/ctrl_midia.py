@@ -5,6 +5,8 @@ from model.serie import Serie
 from model.temporada import Temporada
 from model.episodio import Episodio
 from model.midia_dao import MidiaDAO
+from model.titulo_duplicado_exception import TituloDuplicadoException
+from model.remover_midia_associada_exception import RemoverMidiaAssociadaException
 import os
 
 
@@ -25,6 +27,10 @@ class CtrlMidia():
     @property
     def filmes(self):
         return self.__filmes
+    
+    @property
+    def midia_dao(self):
+        return self.__midia_dao
 
     def abre_tela(self):
         os.system('cls||clear')
@@ -89,27 +95,46 @@ class CtrlMidia():
 Escolha uma opção (criar mídia): """, [1, 2, 3])]()
 
     def criar_filme(self):
-        titulo = self.__tela_midia.recebe_input_str(
-            "Escreva o título do filme: ")
-        filme = Filme(titulo)
-        self.__midia_dao.add(filme)
-        self.__tela_midia.output_texto(f"Filme '{titulo}' criado com sucesso.")
-        self.standby()
+        try:
+            titulo = self.__tela_midia.recebe_input_str(
+                "Escreva o título do filme: ")
+            for filme in self.get_lista_filmes():
+                if filme.titulo == titulo:
+                    raise TituloDuplicadoException
+
+        except TituloDuplicadoException:
+            self.standby()
+        
+        else:
+            filme = Filme(titulo)
+            self.__midia_dao.add(filme)
+            self.__tela_midia.output_texto(f"Filme '{titulo}' criado com sucesso.")
+            self.standby()
 
     def criar_serie(self):
-        titulo = self.__tela_midia.recebe_input_str(
-            "Escreva o título da série: ")
-        num_temporadas = self.__tela_midia.recebe_input_int(
-            "Escolha o número de Temporadas: ", limite=35)
+        try:
+            titulo = self.__tela_midia.recebe_input_str(
+                "Escreva o título da série: ")
+            
+            for serie in self.get_lista_series():
+                if serie.titulo == titulo:
+                    raise TituloDuplicadoException
 
-        serie = Serie(titulo)
-        for i in range(1, num_temporadas + 1):
-            temporada = self.criar_temporada(i)
-            serie.temporadas.append(temporada)
+        except TituloDuplicadoException:
+            self.standby()
+        
+        else:
+            num_temporadas = self.__tela_midia.recebe_input_int(
+                "Escolha o número de Temporadas: ", limite=35)
 
-        self.__midia_dao.add(serie)
-        self.__tela_midia.output_texto(f"Série '{serie.titulo}' criada com sucesso.")
-        self.standby()
+            serie = Serie(titulo)
+            for i in range(1, num_temporadas + 1):
+                temporada = self.criar_temporada(i)
+                serie.temporadas.append(temporada)
+
+            self.__midia_dao.add(serie)
+            self.__tela_midia.output_texto(f"Série '{serie.titulo}' criada com sucesso.")
+            self.standby()
 
     def criar_temporada(self, numero):
         num_episodios = self.__tela_midia.recebe_input_int(
@@ -163,6 +188,8 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
         self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
 
         filmes = self.get_lista_filmes()
+        
+        grupos = self.__ctrl_principal.ctrl_grupo.grupo_dao.get_all()
 
         for (i, filme) in enumerate(filmes, start=1):
             self.__tela_midia.output_texto(f"[{i}] - {filme.titulo}")
@@ -177,6 +204,16 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
             self.abre_tela()
         else:
             filme_escolhido = filmes[opcao - 1]
+        
+        try: 
+            for grupo in grupos:
+                if grupo.midia_associada.titulo == filme_escolhido.titulo:
+                    raise RemoverMidiaAssociadaException
+        
+        except RemoverMidiaAssociadaException:
+            self.standby()
+        
+        else:
             self.__tela_midia.output_texto(
                 f"O filme '{filme_escolhido.titulo}' foi removido com sucesso.")
             self.__midia_dao.remove(filme_escolhido.titulo)
@@ -250,6 +287,8 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
         nome_subtela = 'Alteração de Filmes'
         self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
         
+        grupos = self.__ctrl_principal.ctrl_grupo.grupo_dao.get_all()
+        
         filmes = self.get_lista_filmes()
         
         for (i, filme) in enumerate(filmes, start=1):
@@ -263,12 +302,24 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
             self.abre_tela()
         else:
             filme_escolhido = filmes[opcao - 1]
+            titulo_antigo = filme_escolhido.titulo
             novo_titulo = self.__tela_midia.recebe_input_str(
                 f"Escolha o novo título para o filme '{filme_escolhido.titulo}': ")
-            print(self.__midia_dao.get(filme_escolhido.titulo))
-            print(self.__midia_dao.get(filme_escolhido.titulo).titulo)
-            self.__midia_dao.get(filme_escolhido.titulo).titulo = novo_titulo
-            self.__midia_dao.save()
+            self.__midia_dao.remove(titulo_antigo)
+            filme_escolhido.titulo = novo_titulo
+            self.__ctrl_principal.ctrl_grupo.grupo_dao.dump()
+            
+            # Não sei se precisa desse loop, mas só por garantia vou deixar ele aí
+            for grupo in self.__ctrl_principal.ctrl_grupo.grupo_dao.get_all():
+                if grupo.midia_associada.titulo == titulo_antigo:
+                    grupo_novo = grupo
+                    grupo_novo.midia_associada = filme_escolhido
+                    self.__ctrl_principal.ctrl_grupo.grupo_dao.remove(grupo.nome)
+                    print("Removeu grupo antigo")
+                    self.__ctrl_principal.ctrl_grupo.grupo_dao.add(grupo_novo)
+                    print("Adicionou grupo novo")
+
+            self.__midia_dao.add(filme_escolhido)
             
             self.__tela_midia.output_texto(
                 f"O título do filme '{novo_titulo}' foi alterado com sucesso.")

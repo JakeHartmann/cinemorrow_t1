@@ -17,9 +17,9 @@ class CtrlPessoa():
         
         self.__pessoa_dao = PessoaDAO()
 
-    # @property
-    # def pessoas(self):
-    #     return self.__pessoas
+    @property
+    def pessoa_dao(self):
+        return self.__pessoa_dao
 
     def abre_tela(self):
         os.system('cls||clear')
@@ -61,6 +61,7 @@ class CtrlPessoa():
                 "Digite o nome da pessoa: ")
             email = self.__tela_pessoa.recebe_input_str(
                 f"Digite o email de '{nome}': ")
+            email = email.lower()
 
             if self.__pessoa_dao.get_all():
                 for pessoa in self.__pessoa_dao.get_all():
@@ -112,7 +113,7 @@ Escolha o tipo de mídia favorito de '{nome}': """, [1, 2])
                 pessoa_escolhida = self.__pessoa_dao.get_all()[opcao - 1]
 
                 pessoa_em_grupo = any(
-                    pessoa_escolhida in grupo.pessoas for grupo in self.__ctrl_principal.ctrl_grupo.grupos)
+                    pessoa_escolhida in grupo.pessoas for grupo in self.__ctrl_principal.ctrl_grupo.grupo_dao.get_all())
 
                 if pessoa_em_grupo:
                     self.__tela_pessoa.output_texto(
@@ -151,14 +152,22 @@ Escolha o tipo de mídia favorito de '{nome}': """, [1, 2])
                 if quer_alterar_nome:
                     novo_nome = self.__tela_pessoa.recebe_input_str(
                         f"Digite o novo nome para '{pessoa_escolhida.nome}': ")
-                    pessoa_escolhida.nome = novo_nome
+                    self.__pessoa_dao.get(pessoa_escolhida.email).nome = novo_nome
+                    self.__pessoa_dao.dump()
 
                 quer_alterar_email = self.__tela_pessoa.recebe_input_sn(
                     f"Deseja alterar o E-Mail de '{pessoa_escolhida.nome}' (E-Mail atual: {pessoa_escolhida.email})? (S/N): ")
                 if quer_alterar_email:
                     novo_email = self.__tela_pessoa.recebe_input_str(
                         f"Digite o novo E-Mail para '{pessoa_escolhida.nome}': ")
+                    for pessoa in self.pessoa_dao.get_all():
+                        if pessoa.email == novo_email:
+                            self.__tela_pessoa.output_texto("Esse email já está sendo utilizado.")
+                            self.standby()
+                            return
+                    self.__pessoa_dao.remove(pessoa_escolhida.email)
                     pessoa_escolhida.email = novo_email
+                    self.__pessoa_dao.add(pessoa_escolhida)
 
                 quer_alterar_midia_fav = self.__tela_pessoa.recebe_input_sn(
                     f"Deseja alterar o tipo de mídia favorito de '{pessoa_escolhida.nome}'? (S/N): ")
@@ -170,11 +179,13 @@ Escolha o tipo de mídia favorito de '{nome}': """, [1, 2])
         
 Escolha o novo tipo de mídia favorito de '{pessoa_escolhida.nome}': """, [1, 2, 3])
                     if nova_midia_fav == 1:
-                        pessoa_escolhida.midia_fav = "Filme"
+                        self.__pessoa_dao.get(pessoa_escolhida.email).midia_fav = "Filme"
+                        self.__pessoa_dao.dump()
                     elif nova_midia_fav == 2:
-                        pessoa_escolhida.midia_fav = "Série"
+                        self.__pessoa_dao.get(pessoa_escolhida.email).midia_fav = "Série"
+                        self.__pessoa_dao.dump()
                     elif nova_midia_fav == 3:
-                        pessoa_escolhida.midia_fav = None
+                        self.__pessoa_dao.get(pessoa_escolhida.email).midia_fav = None
 
                 if quer_alterar_nome or quer_alterar_email or quer_alterar_midia_fav:
                     self.__tela_pessoa.output_texto(

@@ -43,10 +43,7 @@ class CtrlPrincipal():
 
         lista_opcoes = {
             1: self.tipo_de_midia_mais_favorita,
-            2: self.pessoa_em_mais_grupos,
-            3: self.grupo_com_mais_pessoas,
-            4: self.tipo_de_midia_mais_assistida,
-            5: self.abre_tela
+            2: self.abre_tela,
         }
 
         while True:
@@ -55,10 +52,13 @@ class CtrlPrincipal():
             escolha = lista_opcoes[opcao]
             escolha()
 
+    # Refatorar em algum momento da minha aposentadoria
     def tipo_de_midia_mais_favorita(self):
-        midias_fav = [
-            pessoa.midia_fav for pessoa in self.ctrl_pessoa.pessoas if pessoa.midia_fav]
-
+        midias_fav = []
+        for pessoa in self.ctrl_pessoa.pessoa_dao.get_all():
+            if pessoa.midia_fav != 'Nenhuma':
+                midias_fav.append(pessoa.midia_fav)
+        
         if midias_fav:
             contagem_midias = Counter(midias_fav)
             mais_comuns = contagem_midias.most_common()
@@ -78,60 +78,74 @@ class CtrlPrincipal():
 
         self.standby()
 
-    def pessoa_em_mais_grupos(self):
-        if self.ctrl_grupo.grupos:
-            contador_pessoa = Counter(
-                [pessoa for grupo in self.ctrl_grupo.grupos for pessoa in grupo.pessoas])
-            if contador_pessoa:
-                quantidade_max = contador_pessoa.most_common(1)[0][1]
 
-                pessoas_empate = [pessoa for pessoa, quantidade in contador_pessoa.items(
-                ) if quantidade == quantidade_max]
-                if len(pessoas_empate) == 1:
-                    pessoa_mais_comum = pessoas_empate[0]
-                    self.tela_principal.output_texto(
-                        f"A pessoa no maior número de grupos é: {pessoa_mais_comum.nome}, Quantidade de grupos: {quantidade_max}")
-                else:
-                    self.tela_principal.output_texto(
-                        "Empate! Pessoas com o mesmo número de ocorrência em grupos: ")
-                    for pessoa in pessoas_empate:
-                        self.tela_principal.output_texto(f"- {pessoa.nome}")
+    # Aposentado
+    # def pessoa_em_mais_grupos(self):
+    #     grupos = self.ctrl_grupo.grupo_dao.get_all()
 
-            else:
-                self.tela_principal.output_texto("Nenhuma pessoa em grupos.")
+    #     if not grupos:
+    #         self.tela_principal.output_texto("Sem grupos disponíveis.")
+    #         self.standby()
+    #         return
 
-        else:
-            self.tela_principal.output_texto("Sem grupos disponíveis.")
+    #     pessoas_em_grupos = set(pessoa for grupo in grupos for pessoa in grupo.pessoas)
 
-        self.standby()
+    #     if not pessoas_em_grupos:
+    #         self.tela_principal.output_texto("Nenhuma pessoa em grupos.")
+    #         self.standby()
+    #         return
 
-    def grupo_com_mais_pessoas(self):
-        if self.ctrl_grupo.grupos:
-            grupos_por_quantidade = Counter(
-                len(grupo.pessoas) for grupo in self.ctrl_grupo.grupos)
-            if grupos_por_quantidade:
-                max_quantidade = grupos_por_quantidade.most_common(1)[0][1]
+    #     contador_pessoa = Counter(pessoas_em_grupos)
+    #     quantidade_max = max(contador_pessoa.values())
 
-                grupos_tie = [grupo for grupo in self.ctrl_grupo.grupos if len(
-                    grupo.pessoas) == max_quantidade]
+    #     pessoas_empate = [pessoa for pessoa, quantidade in contador_pessoa.items() if quantidade == quantidade_max]
 
-                if len(grupos_tie) == 1:
-                    grupo_mais_pessoas = grupos_tie[0]
-                    quantidade_pessoas = len(grupo_mais_pessoas.pessoas)
-                    self.tela_principal.output_texto(
-                        f"O grupo com mais pessoas é: {grupo_mais_pessoas.nome}, Quantidade: {quantidade_pessoas} pessoa(s)")
-                else:
-                    self.tela_principal.output_texto(
-                        f"Empate! Grupos com o mesmo número de pessoas ({max_quantidade}):")
-                    for grupo in grupos_tie:
-                        quantidade_pessoas = len(grupo.pessoas)
-                        self.tela_principal.output_texto(f"- {grupo.nome} ({quantidade_pessoas} pessoas)")
-            else:
-                self.tela_principal.output_texto("Sem informações disponíveis.")
-        else:
-            self.tela_principal.output_texto("Sem grupos disponíveis.")
+    #     if len(pessoas_empate) == 1:
+    #         pessoa_mais_comum = pessoas_empate[0]
+    #         self.tela_principal.output_texto(
+    #             f"A pessoa no maior número de grupos é: {pessoa_mais_comum.nome}, Quantidade de grupos: {quantidade_max}")
+    #     else:
+    #         self.tela_principal.output_texto(
+    #             "Empate! Pessoas com o mesmo número de ocorrência em grupos:")
+    #         for pessoa in pessoas_empate:
+    #             quantidade_grupos = contador_pessoa[pessoa]
+    #             self.tela_principal.output_texto(f"- {pessoa.nome} (Quantidade de grupos: {quantidade_grupos})")
 
-        self.standby()
+    #     self.standby()
+
+    # Aposentado
+    # def grupo_com_mais_pessoas(self):
+    #     grupos = self.ctrl_grupo.grupo_dao.get_all()
+        
+    #     if not grupos:
+    #         self.tela_principal.output_texto("Sem grupos disponíveis.")
+    #         self.standby()
+    #         return
+        
+    #     grupos_por_quantidade = Counter(len(grupo.pessoas) for grupo in grupos)
+        
+    #     if not grupos_por_quantidade:
+    #         self.tela_principal.output_texto("Sem informações disponíveis.")
+    #         self.standby()
+    #         return
+        
+    #     max_quantidade = max(grupos_por_quantidade.values())
+        
+    #     grupos_tie = [grupo for grupo in grupos if len(grupo.pessoas) == max_quantidade]
+        
+    #     if len(grupos_tie) == 1:
+    #         grupo_mais_pessoas = grupos_tie[0]
+    #         quantidade_pessoas = len(grupo_mais_pessoas.pessoas)
+    #         self.tela_principal.output_texto(f"O grupo com mais pessoas é: '{grupo_mais_pessoas.nome}', com {quantidade_pessoas} pessoa(s)")
+    #     else:
+    #         self.tela_principal.output_texto(
+    #             f"Empate! Grupos com o mesmo número de pessoas ({max_quantidade}):")
+    #         for grupo in grupos_tie:
+    #             quantidade_pessoas = len(grupo.pessoas)
+    #             self.tela_principal.output_texto(f"-  {grupo.nome} ({quantidade_pessoas} pessoas)")
+        
+    #     self.standby() 
+        
 
     # def grupo_com_mais_pessoas(self):
     #     if self.ctrl_grupo.grupos:
@@ -158,29 +172,30 @@ class CtrlPrincipal():
 
     #     self.standby()
 
-    def tipo_de_midia_mais_assistida(self):
-        midias_associadas = [
-            grupo.midia_associada for grupo in self.ctrl_grupo.grupos if grupo.midia_associada]
+    # Aposentado
+    # def tipo_de_midia_mais_assistida(self):
+    #     midias_associadas = [
+    #         grupo.midia_associada for grupo in self.ctrl_grupo.grupo_dao.get_all() if grupo.midia_associada]
 
-        if midias_associadas:
-            midias_mais_vistas = Counter(midias_associadas).most_common()
-            tipo_midia_mais_vista, quantidade = midias_mais_vistas[0]
+    #     if midias_associadas:
+    #         midias_mais_vistas = Counter(midias_associadas).most_common()
+    #         tipo_midia_mais_vista, quantidade = midias_mais_vistas[0]
 
-            empate_midias = [
-                midia for midia, quantidade in midias_mais_vistas[1:] if quantidade == quantidade]
+    #         empate_midias = [
+    #             midia for midia, qtd in midias_mais_vistas[1:] if qtd == quantidade]
 
-            if len(empate_midias) == 0:
-                self.tela_principal.output_texto(
-                    f"O tipo de mídia mais visto é: {tipo_midia_mais_vista.titulo}, Quantidade: {quantidade}")
-            else:
-                self.tela_principal.output_texto(
-                    f"Empate! Tipos de mídia com a mesma quantidade de visualizações ({quantidade}):")
-                for midia in [tipo_midia_mais_vista] + empate_midias:
-                    self.tela_principal.output_texto(f"- {midia.titulo}")
-        else:
-            self.tela_principal.output_texto("Sem informações disponíveis.")
+    #         if len(empate_midias) == 0:
+    #             self.tela_principal.output_texto(
+    #                 f"O tipo de mídia mais visto é: {tipo_midia_mais_vista.titulo}, Quantidade: {quantidade}")
+    #         else:
+    #             self.tela_principal.output_texto(
+    #                 f"Empate! Tipos de mídia com a mesma quantidade de visualizações ({quantidade}):")
+    #             for midia in [tipo_midia_mais_vista] + empate_midias:
+    #                 self.tela_principal.output_texto(f"- {midia.titulo}")
+    #     else:
+    #         self.tela_principal.output_texto("Sem informações disponíveis.")
 
-        self.standby()
+    #     self.standby()
 
     def abre_tela(self):
         os.system('cls||clear')
@@ -218,19 +233,21 @@ class CtrlPrincipal():
             escolha()
 
     def existem_midias(self):
-        if self.ctrl_midia.filmes or self.ctrl_midia.series:
+        if self.ctrl_midia.midia_dao.get_all():
             return True
         else:
             return False
 
     def existem_pessoas(self):
-        if self.ctrl_pessoa.pessoas:
+        if self.ctrl_pessoa.pessoa_dao.get_all():
             return True
         else:
             return False
 
+    # Não sei se isso funciona ainda
     def pessoa_is_membro_do_grupo(self, pessoa, grupo):
-        return pessoa in grupo.pessoas
+        grupo_em_questao = self.ctrl_grupo.grupo_dao.get(grupo.nome)
+        return pessoa in grupo_em_questao.pessoas
 
     def standby(self):
         self.tela_principal.output_texto("\nAperte qualquer tecla para retornar ao menu principal.")

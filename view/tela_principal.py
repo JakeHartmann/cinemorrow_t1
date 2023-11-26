@@ -12,7 +12,5 @@ class TelaPrincipal(AbstractTela):
         print(f'{nome_tela:~^45}')
         print("""
     1 - Tipo de Mídia favorita mais comum
-    2 - Pessoa em mais grupos
-    3 - Grupo com mais pessoas
-    4 - Mídia mais assistida
-    5 - Voltar""")
+    2 - Voltar
+    """)

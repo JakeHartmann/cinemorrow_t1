@@ -60,3 +60,7 @@ O sistema oferece uma interface gráfica e persistência de dados.
 - Registros: número de vezes que um relatório foi gerado
 - Relatórios: 
     - Tipo de mídia favorita mais comum;
+
+## Bugs Conhecidos:
+
+- Exemplo fictício: caso exista um grupo com a mídia associada "Oppenheimer" e o usuário alterar o nome da mídia para "Barbie", tudo ocorre normalmente. Agora, caso o usuário mude mais uma vez para "Interstellar", por exemplo, a listagem de grupos irá listar a mídia associada ainda como "Barbie".

@@ -24,5 +24,3 @@ class Episodio():
     def assistido(self, assistido):
         if isinstance(assistido, bool):
             self.__assistido = assistido
-        else:
-            print("O valor de assistido deve ser um booleano.")

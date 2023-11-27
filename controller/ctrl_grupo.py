@@ -86,6 +86,11 @@ class CtrlGrupo():
 
         grupos = self.__grupo_dao.get_all()
 
+        if not grupos:
+            self.__tela_grupo.show_message(
+                "Alerta!", "Não há grupos cadastrados.")
+            self.abre_tela()
+
         grupo_escolhido = self.__tela_grupo.mostra_lista_grupos(
             grupos, allow_selection=True)
         if grupo_escolhido is None:
@@ -95,10 +100,6 @@ class CtrlGrupo():
             self.__grupo_dao.remove(grupo_escolhido.nome)
             self.__tela_grupo.show_message(
                 "Sucesso!", f"O grupo '{grupo_escolhido.nome}' foi removido com sucesso.")
-
-        else:
-            self.__tela_grupo.show_message(
-                "Alerta!", "Não há grupos cadastrados.")
 
         self.abre_tela()
 

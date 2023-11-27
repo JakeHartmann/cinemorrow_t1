@@ -13,11 +13,10 @@ class GrupoDAO(DAO):
     def get(self, nome: str):
         if isinstance(nome, str):
             return super().get(nome)
-        
+
     def remove(self, nome: str):
         if isinstance(nome, str):
             super().remove(nome)
 
-    # Generalizar depois
     def save(self):
         self.dump()

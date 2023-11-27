@@ -7,7 +7,6 @@ from model.episodio import Episodio
 from model.midia_dao import MidiaDAO
 from model.titulo_duplicado_exception import TituloDuplicadoException
 from model.remover_midia_associada_exception import RemoverMidiaAssociadaException
-import os
 
 
 class CtrlMidia():
@@ -15,36 +14,13 @@ class CtrlMidia():
         self.__ctrl_principal = ctrl_principal
         self.__tela_midia = TelaMidia()
 
-        self.__series = []
-        self.__filmes = []
-        
         self.__midia_dao = MidiaDAO()
 
-    @property
-    def series(self):
-        return self.__series
-
-    @property
-    def filmes(self):
-        return self.__filmes
-    
     @property
     def midia_dao(self):
         return self.__midia_dao
 
     def abre_tela(self):
-        os.system('cls||clear')
-        nome_tela = 'Gerencia de Midias'
-        opcoes = """
-    1 - Adicionar Mídia
-    2 - Remover Mídia
-    3 - Alterar Mídia
-    4 - Listar Mídias
-    5 - Voltar
-    """
-        self.__tela_midia.output_texto(f'{nome_tela:~^40}')
-        self.__tela_midia.output_texto(opcoes)
-
         lista_opcoes = {
             1: self.cria_midia,
             2: self.remove_midia,
@@ -54,11 +30,7 @@ class CtrlMidia():
         }
 
         while True:
-            opcao = self.__tela_midia.recebe_input_int(
-                "Escolha uma opção (midias): ", [1, 2, 3, 4, 5])
-
-            escolha = lista_opcoes[opcao]
-            escolha()
+            lista_opcoes[self.__tela_midia.tela_opcoes()]()
 
     def get_lista_filmes(self):
         filmes = []
@@ -67,79 +39,74 @@ class CtrlMidia():
             if isinstance(value, Filme):
                 filmes.append(value)
         return filmes
-    
+
     def get_lista_series(self):
         series = []
-        
+
         for value in self.__midia_dao.get_all():
             if isinstance(value, Serie):
                 series.append(value)
         return series
 
     def cria_midia(self):
-        os.system('cls||clear')
-        nome_subtela = 'Adição de Mídia'
-        self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
-
         lista_opcoes = {
             1: self.criar_filme,
             2: self.criar_serie,
             3: self.abre_tela
         }
 
-        lista_opcoes[self.__tela_midia.recebe_input_int("""
-    1 - Filme
-    2 - Série
-    3 - Voltar
-    
-Escolha uma opção (criar mídia): """, [1, 2, 3])]()
+        lista_opcoes[self.__tela_midia.seleciona_midia()]()
 
     def criar_filme(self):
         try:
-            titulo = self.__tela_midia.recebe_input_str(
-                "Escreva o título do filme: ")
+            titulo = self.__tela_midia.pega_titulo_filme()
+            if titulo is None:
+                self.abre_tela()
             for filme in self.get_lista_filmes():
                 if filme.titulo == titulo:
                     raise TituloDuplicadoException
 
         except TituloDuplicadoException:
-            self.standby()
-        
+            self.__tela_midia.show_message(
+                "Alerta!", "Um filme com este título já existe.")
+
         else:
             filme = Filme(titulo)
             self.__midia_dao.add(filme)
-            self.__tela_midia.output_texto(f"Filme '{titulo}' criado com sucesso.")
-            self.standby()
+            self.__tela_midia.show_message(
+                "Sucesso!", f"Filme '{titulo}' criado com sucesso.")
+            self.abre_tela()
 
     def criar_serie(self):
         try:
-            titulo = self.__tela_midia.recebe_input_str(
-                "Escreva o título da série: ")
-            
+            titulo, num_temporadas, episodios_por_temporada = self.__tela_midia.pega_dados_serie()
+            if titulo is None and num_temporadas is None and episodios_por_temporada is None:
+                self.abre_tela()
+
             for serie in self.get_lista_series():
                 if serie.titulo == titulo:
                     raise TituloDuplicadoException
 
         except TituloDuplicadoException:
-            self.standby()
-        
+            self.__tela_midia.show_message(
+                "Alerta!", "Esse título já está sendo utilizado.")
+            self.abre_tela()
+
         else:
-            num_temporadas = self.__tela_midia.recebe_input_int(
-                "Escolha o número de Temporadas: ", limite=35)
 
             serie = Serie(titulo)
-            for i in range(1, num_temporadas + 1):
-                temporada = self.criar_temporada(i)
+            for i, num_episodios in enumerate(episodios_por_temporada, start=1):
+                temporada = self.criar_temporada(i, num_episodios)
                 serie.temporadas.append(temporada)
 
             self.__midia_dao.add(serie)
-            self.__tela_midia.output_texto(f"Série '{serie.titulo}' criada com sucesso.")
-            self.standby()
+            self.__tela_midia.show_message(
+                "Sucesso!", f"Série '{titulo}' criada com sucesso.")
+            self.abre_tela()
 
-    def criar_temporada(self, numero):
-        num_episodios = self.__tela_midia.recebe_input_int(
-            f"Escreva o número de episódios para a Temporada {numero}: ")
+    def criar_temporada(self, numero, num_episodios):
         temporada = Temporada(numero)
+
         for numero_episodio in range(1, num_episodios + 1):
             episodio = Episodio(numero_episodio)
             temporada.episodios.append(episodio)
@@ -147,231 +114,156 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
         return temporada
 
     def remove_midia(self):
-        os.system('cls||clear')
-        nome_subtela = 'Remoção de Mídia'
-        self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
-
         filmes = self.get_lista_filmes()
         series = self.get_lista_series()
 
         if not (filmes or series):
-            self.__tela_midia.output_texto("Opa, parece que não há nem filmes e nem séries cadastrados.")
-            self.standby()
-
-        lista_opcoes = {}
-        opcao = 1
-
-        if filmes:
-            lista_opcoes[opcao] = self.remove_filme
-            self.__tela_midia.output_texto(f"\n    {opcao} - Filme")
-            opcao += 1
-
-        if series:
-            lista_opcoes[opcao] = self.remove_serie
-            self.__tela_midia.output_texto(f"    {opcao} - Série")
-            opcao += 1
-
-        lista_opcoes[opcao] = self.abre_tela
-        self.__tela_midia.output_texto(f"    {opcao} - Voltar")
-
-        opcao_escolhida = self.__tela_midia.recebe_input_int(
-            "\nEscolha o tipo de mídia a ser removido: ", range(1, opcao + 1))
-        if opcao_escolhida in lista_opcoes:
-            escolha_tipo_midia = lista_opcoes[opcao_escolhida]
-            escolha_tipo_midia()
-        else:
+            self.__tela_midia.show_message(
+                "Alerta!", "Não há nenhum tipo de mídia cadastrado.")
             self.abre_tela()
 
-    def remove_filme(self):
-        os.system('cls||clear')
-        nome_subtela = 'Remoção de Filmes'
-        self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
+        tipo_midia = self.__tela_midia.seleciona_midia()
 
-        filmes = self.get_lista_filmes()
-        
+        if tipo_midia == 1:
+            if not filmes:
+                self.__tela_midia.show_message(
+                    "Alerta!", "Não há filmes cadastrados.")
+            else:
+                filme_selecionado = self.__tela_midia.mostra_lista_filmes(
+                    filmes, allow_selection=True)
+                self.remove_filme(filme_selecionado)
+
+        if tipo_midia == 2:
+            if not series:
+                self.__tela_midia.show_message(
+                    "Alerta!", "Não há séries cadastradas.")
+            else:
+                serie_selecionada = self.__tela_midia.mostra_lista_series(
+                    series, allow_selection=True)
+                self.remove_serie(serie_selecionada)
+
+    def remove_filme(self, filme_escolhido):
+
+        if filme_escolhido is None:
+            self.abre_tela()
+
         grupos = self.__ctrl_principal.ctrl_grupo.grupo_dao.get_all()
 
-        for (i, filme) in enumerate(filmes, start=1):
-            self.__tela_midia.output_texto(f"[{i}] - {filme.titulo}")
-
-        self.__tela_midia.output_texto("0 para retornar")
-        validos = list(range(1, len(filmes) + 1)) + [0]
-
-        opcao = self.__tela_midia.recebe_input_int(
-            "\nEscolha o índice associado ao filme para removê-lo: ", validos)
-
-        if opcao == 0:
-            self.abre_tela()
-        else:
-            filme_escolhido = filmes[opcao - 1]
-        
-        try: 
+        try:
             for grupo in grupos:
                 if grupo.midia_associada.titulo == filme_escolhido.titulo:
                     raise RemoverMidiaAssociadaException
-        
+
         except RemoverMidiaAssociadaException:
-            self.standby()
-        
-        else:
-            self.__tela_midia.output_texto(
-                f"O filme '{filme_escolhido.titulo}' foi removido com sucesso.")
-            self.__midia_dao.remove(filme_escolhido.titulo)
-            self.standby()
-
-    def remove_serie(self):
-        os.system('cls||clear')
-        nome_subtela = 'Remoção de Séries'
-        self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
-        
-        series = self.get_lista_series()
-        
-        for (i, serie) in enumerate(series, start=1):
-            self.__tela_midia.output_texto(f"[{i}] - {serie.titulo}")
-
-        self.__tela_midia.output_texto("0 para retornar")
-        validos = list(range(1, len(series) + 1)) + [0]
-
-        opcao = self.__tela_midia.recebe_input_int(
-            "\nEscolha o índice associado à série para removê-la: ", validos)
-
-        if opcao == 0:
+            self.__tela_midia.show_message(
+                "Alerta!", "Essa mídia está associada a um grupo.")
             self.abre_tela()
+
         else:
-            serie_escolhida = series[opcao - 1]
-            self.__tela_midia.output_texto(
-                f"A série '{serie_escolhida.titulo}' foi removida com sucesso.")
-            self.__midia_dao.remove(serie_escolhida.titulo)
-            self.standby()
+            self.__tela_midia.show_message(
+                "Sucesso!", f"O filme '{filme_escolhido.titulo}' foi removido com sucesso.")
+            self.__midia_dao.remove(filme_escolhido.titulo)
+            self.abre_tela()
+
+    def remove_serie(self, serie_escolhida):
+
+        if serie_escolhida is None:
+            self.abre_tela()
+
+        grupos = self.__ctrl_principal.ctrl_grupo.grupo_dao.get_all()
+
+        try:
+            for grupo in grupos:
+                if grupo.midia_associada.titulo == serie_escolhida.titulo:
+                    raise RemoverMidiaAssociadaException
+
+        except RemoverMidiaAssociadaException:
+            self.__tela_midia.show_message(
+                "Alerta!", "Essa mídia está associada a um grupo.")
+            self.abre_tela()
+
+        else:
+            self.__tela_midia.show_message(
+                "Sucesso!", f"A série '{serie_escolhida.titulo}' foi removida com sucesso.")
+        self.__midia_dao.remove(serie_escolhida.titulo)
+        self.abre_tela()
 
     def altera_midia(self):
-        os.system('cls||clear')
-        nome_subtela = 'Alteração de Mídias'
-        self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
-
         filmes = self.get_lista_filmes()
         series = self.get_lista_series()
 
         if not (filmes or series):
-            self.__tela_midia.output_texto("Opa, parece que não há nem filmes e nem séries cadastrados.")
-            self.standby()
-            return
-
-        lista_opcoes = {}
-        opcao = 1
-
-        if filmes:
-            lista_opcoes[opcao] = self.altera_filme
-            self.__tela_midia.output_texto(f"\n    {opcao} - Filme")
-            opcao += 1
-
-        if series:
-            lista_opcoes[opcao] = self.altera_serie
-            self.__tela_midia.output_texto(f"    {opcao} - Série")
-            opcao += 1
-
-        lista_opcoes[opcao] = self.abre_tela
-        self.__tela_midia.output_texto(f"    {opcao} - Voltar")
-
-        opcao_escolhida = self.__tela_midia.recebe_input_int(
-            "\nEscolha o tipo de mídia a ser alterado: ", range(1, opcao + 1))
-
-        if opcao_escolhida in lista_opcoes:
-            escolha_tipo_midia = lista_opcoes[opcao_escolhida]
-            escolha_tipo_midia()
-        else:
+            self.__tela_midia.show_message(
+                "Alerta!", "Não há nenhuma mídia cadastrada.")
             self.abre_tela()
 
-    def altera_filme(self):
-        os.system('cls||clear')
-        nome_subtela = 'Alteração de Filmes'
-        self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
-        
-        grupos = self.__ctrl_principal.ctrl_grupo.grupo_dao.get_all()
-        
-        filmes = self.get_lista_filmes()
-        
-        for (i, filme) in enumerate(filmes, start=1):
-            self.__tela_midia.output_texto(f"[{i}] - {filme.titulo}")
-        self.__tela_midia.output_texto("0 para retornar")
-        validos = list(range(1, len(filmes) + 1)) + [0]
+        tipo_midia = self.__tela_midia.seleciona_midia()
 
-        opcao = self.__tela_midia.recebe_input_int(
-            "\nEscolha o índice associado ao filme para alterá-lo: ", validos)
-        if opcao == 0:
-            self.abre_tela()
-        else:
-            filme_escolhido = filmes[opcao - 1]
-            titulo_antigo = filme_escolhido.titulo
-            novo_titulo = self.__tela_midia.recebe_input_str(
-                f"Escolha o novo título para o filme '{filme_escolhido.titulo}': ")
-            self.__midia_dao.remove(titulo_antigo)
-            filme_escolhido.titulo = novo_titulo
-            self.__ctrl_principal.ctrl_grupo.grupo_dao.dump()
-            
-            # Não sei se precisa desse loop, mas só por garantia vou deixar ele aí
-            for grupo in self.__ctrl_principal.ctrl_grupo.grupo_dao.get_all():
-                if grupo.midia_associada.titulo == titulo_antigo:
-                    grupo_novo = grupo
-                    grupo_novo.midia_associada = filme_escolhido
-                    self.__ctrl_principal.ctrl_grupo.grupo_dao.remove(grupo.nome)
-                    print("Removeu grupo antigo")
-                    self.__ctrl_principal.ctrl_grupo.grupo_dao.add(grupo_novo)
-                    print("Adicionou grupo novo")
-
-            self.__midia_dao.add(filme_escolhido)
-            
-            self.__tela_midia.output_texto(
-                f"O título do filme '{novo_titulo}' foi alterado com sucesso.")
-            self.standby()
-
-    def altera_serie(self):
-        os.system('cls||clear')
-        nome_subtela = 'Alteração de Séries'
-        self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
-        
-        series = self.get_lista_series()
-        
-        for (i, serie) in enumerate(series, start=1):
-            self.__tela_midia.output_texto(f"[{i}] - {serie.titulo}")
-        self.__tela_midia.output_texto("0 para retornar")
-        validos = list(range(1, len(series) + 1)) + [0]
-
-        opcao = self.__tela_midia.recebe_input_int(
-            "\nEscolha o índice associado à série para alterá-la: ", validos)
-        if opcao == 0:
-            self.abre_tela()
-        else:
-            serie_escolhida = series[opcao - 1]
-
-            mudar_titulo = self.__tela_midia.recebe_input_sn(
-                f"Deseja alterar o título da série '{serie_escolhida.titulo}'? (S/N): ")
-            if mudar_titulo:
-                novo_titulo = self.__tela_midia.recebe_input_str(
-                    f"Digite o novo título para a série '{serie_escolhida.titulo}': ")
-                serie_escolhida.titulo = novo_titulo
-
-            mudar_temporada = self.__tela_midia.recebe_input_sn(
-                "Deseja alterar o número de temporadas da série? (S/N): ")
-            if mudar_temporada:
-                novo_numero_temporadas = self.__tela_midia.recebe_input_int(
-                    "Digite o novo número de Temporadas: ")
-                serie_escolhida.temporadas = [self.criar_temporada(
-                    i) for i in range(1, novo_numero_temporadas + 1)]
-
-            if mudar_titulo or mudar_temporada:
-                self.__tela_midia.output_texto(
-                    f"Os dados da série '{serie_escolhida.titulo}' foram alterados com sucesso.")
+        if tipo_midia == 1:
+            if not filmes:
+                self.__tela_midia.show_message(
+                    "Alerta!", "Não há filmes cadastrados.")
             else:
-                self.__tela_midia.output_texto(
-                    f"Não houve mudança nos dados da série '{serie_escolhida.titulo}'.")
-            self.standby()
+                filme_selecionado = self.__tela_midia.mostra_lista_filmes(
+                    filmes, allow_selection=True)
+                self.altera_filme(filme_selecionado)
+
+        if tipo_midia == 2:
+            if not series:
+                self.__tela_midia.show_message(
+                    "Alerta!", "Não há séries cadastradas.")
+            else:
+                serie_selecionada = self.__tela_midia.mostra_lista_series(
+                    series, allow_selection=True)
+                self.altera_serie(serie_selecionada)
+
+    def altera_filme(self, filme_escolhido):
+
+        if filme_escolhido is None:
+            self.abre_tela()
+
+        novo_titulo = self.__tela_midia.pega_titulo_filme(
+            titulo_antigo=filme_escolhido.titulo)
+        if novo_titulo is None:
+            self.abre_tela()
+
+        titulo_antigo = filme_escolhido.titulo
+        self.__midia_dao.remove(titulo_antigo)
+        filme_escolhido.titulo = novo_titulo
+        self.__ctrl_principal.ctrl_grupo.grupo_dao.dump()
+
+        self.__midia_dao.add(filme_escolhido)
+
+        self.__tela_midia.show_message(
+            "Sucesso!", f"O título do filme '{novo_titulo}' foi alterado com sucesso.")
+        self.abre_tela()
+
+    def altera_serie(self, serie_escolhida):
+
+        if serie_escolhida is None:
+            self.abre_tela()
+
+        num_atual_temporadas = len(serie_escolhida.temporadas)
+
+        dados_atuais = (serie_escolhida.titulo, num_atual_temporadas)
+
+        novo_titulo, novo_num_temporadas, novo_episodios_por_temporada = self.__tela_midia.pega_dados_serie(
+            old_data=dados_atuais)
+
+        titulo_antigo = serie_escolhida.titulo
+        self.__midia_dao.remove(titulo_antigo)
+        serie_escolhida.titulo = novo_titulo
+        serie_escolhida.temporadas = []
+        for i, num_episodios in enumerate(novo_episodios_por_temporada, start=1):
+            temporada = self.criar_temporada(i, num_episodios)
+            serie_escolhida.temporadas.append(temporada)
+
+        self.__midia_dao.add(serie_escolhida)
+        self.__tela_midia.show_message(
+            "Sucesso!", f"Os dados da série '{serie_escolhida.titulo}' foram alterados.")
+        self.abre_tela()
 
     def lista_midias(self):
-        os.system('cls||clear')
-        nome_subtela = 'Listagem de Mídias'
-        self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
-
         if self.__midia_dao.get_all():
 
             lista_opcoes = {
@@ -380,62 +272,35 @@ Escolha uma opção (criar mídia): """, [1, 2, 3])]()
                 3: self.abre_tela
             }
 
-            opcao = self.__tela_midia.recebe_input_int("""
-    1 - Filmes
-    2 - Séries
-    3 - Voltar
-        
-Escolha qual tipo de mídia para listar (listagem de mídia): """, [1, 2, 3])
-            lista_opcoes[opcao]()
-            self.standby()
+            lista_opcoes[self.__tela_midia.seleciona_midia()]()
+
         else:
-            self.__tela_midia.output_texto("Opa, parece que não há nenhuma mídia cadastrada.")
-            self.standby()
+            self.__tela_midia.show_message(
+                "Alerta!", "Parece que não há nenhuma mídia cadastrada.")
+            self.abre_tela()
 
     def lista_filmes(self):
-        os.system('cls||clear')
-        nome_subtela = 'Filmes Cadastrados'
-        self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
-        
+
         filmes = self.get_lista_filmes()
-        
+
         if filmes:
-            for filme in filmes:
-                self.__tela_midia.output_texto(filme.titulo)
+            self.__tela_midia.mostra_lista_filmes(filmes)
         else:
-            self.__tela_midia.output_texto("Opa, parece que não há nenhum filme cadastrado.")
-        self.standby()
+            self.__tela_midia.show_message(
+                "Alerta!", "Não há nenhum filme cadastrado.")
+            self.abre_tela()
 
     def lista_series(self):
-        os.system('cls||clear')
-        nome_subtela = 'Séries Cadastradas'
-        self.__tela_midia.output_texto(f'{nome_subtela:~^40}')
 
         series = self.get_lista_series()
 
-        if series:
-            for serie in series:
-                self.__tela_midia.output_texto(f"\n{serie.titulo}")
+        if not series:
+            self.__tela_midia.show_message(
+                "Alerta!", "Não há nenhuma série cadastrada.")
+            self.abre_tela()
+            return
 
-                for temporada in serie.temporadas:
-                    num_episodios = len(temporada.episodios)
-                    if num_episodios == 1:
-                        self.__tela_midia.output_texto(
-                            f"Temporada {temporada.numero}: {num_episodios} episódio")
-                    else:
-                        self.__tela_midia.output_texto(
-                            f"Temporada {temporada.numero}: {num_episodios} episódios")
-                self.__tela_midia.output_texto("")
-
-        else:
-            self.__tela_midia.output_texto("Opa, parece que não há nenhuma série cadastrada.")
-
-        self.standby()
-
-    def standby(self):
-        self.__tela_midia.output_texto("\nAperte qualquer tecla para retornar à gerencia de mídias.")
-        input()
-        self.abre_tela()
+        self.__tela_midia.mostra_lista_series(series)
 
     def retorna(self):
         self.__ctrl_principal.abre_tela()

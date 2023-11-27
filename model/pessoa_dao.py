@@ -14,12 +14,6 @@ class PessoaDAO(DAO):
         if isinstance(email, str):
             return super().get(email)
 
-
     def remove(self, email: str):
         if isinstance(email, str):
             super().remove(email)
-    # Talvez tenha que mudar        
-    # Dessa maneira:
-    # def remove(self, pessoa: Pessoa):
-    #     if isinstance(pessoa, Pessoa):
-    #         super().remove(pessoa.email)

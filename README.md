@@ -1,7 +1,8 @@
 
-# T1 Parte I: Modelagem e Documentação
+# Trabalho T2: Modelagem e Implementação
 **PROBLEMA**:
 Implementar um sistema orientado a objetos em Python com o intuito de organizar grupos para assistir determinados tipos de mídias.
+Dessa vez, com interface gráfica.
  
 
 
@@ -36,28 +37,26 @@ Um grupo é uma agregação de pessoas, possui um nome e uma única mídia assoc
 - Adicionar Grupo: é solicitado ao usuário o nome do grupo, um integrante base, uma mídia associada e uma data para a sessão
 - Remover Grupo: a listagem de grupos ocorre, e um índice associado ao grupo serviria de identificador para a sua opcional exclusão
 - Alterar Grupo: novamente, a listagem de grupos ocorreria, e o usuário terá a opção de escolher o índice associado ao grupo, podendo então realizar algumas ações
-    - Modificar Grupo (altera as informações do grupo, incluindo a data e o progresso caso uma série esteja sendo assistida)
+    - Alterar Nome (altera o nome do grupo)
     - Adicionar Membro (uma pessoa pode ser adicionada ao grupo)
     - Remover Membro (a listagem de pessoas incluídas no grupo ocorre e um índice associado à determinada pessoa serve de identificador para sua opcional exclusão)
+    - Alterar Data da Próxima Sessão ()
 - Listar Grupos: a listagem de grupos cadastrados ocorre, e próximo de cada grupo será mostrado a sua data associada, além do seu progresso caso possível. Isto é, caso o tipo de mídia associada ao grupo seja uma série, a porcentagem de episódios já assistidos será mostrada, tal como o número de episódios restantes
 
 ## Relatórios
 
-Os relatórios consistem em estatísticas básicas envolvendo o número de ocorrências de certo atributo, como por exemplo a pessoa que está em mais grupos.
+Os relatórios consistem em estatísticas básicas envolvendo o número de ocorrências de certo atributo, como por exemplo o tipo de mídia mais favorito.
 ## Regras de Negócio
 
 Um grupo só poderá ter uma mídia regente.
 
 ## Escopo
 
-Para simplificar esse trabalho, o sistema implementado não oferece o armazenamento dos dados gerados em bancos de dados ou em arquivos.
+O sistema oferece uma interface gráfica e persistência de dados.
 
 ## Considerações
 
 - Cadastros: tipos diferentes de mídia, pessoas e grupos
-- Registros: grupo (sessão)
+- Registros: número de vezes que um relatório foi gerado
 - Relatórios: 
     - Tipo de mídia favorita mais comum;
-    - Pessoa que está em mais grupos; 
-    - Grupo com mais pessoas; 
-    - Tipo de mídia mais visto

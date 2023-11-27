@@ -4,8 +4,7 @@ class Episodio():
     def __init__(self, numero: int):
         if isinstance(numero, int):
             self.__numero = numero
-        # if isinstance(duracao, int):
-        #     self.__duracao = duracao
+
         self.__assistido = False
 
     @property
@@ -16,14 +15,6 @@ class Episodio():
     def numero(self, numero):
         if isinstance(numero, int):
             self.__numero = numero
-
-    # @property
-    # def duracao(self):
-    #     return self.__duracao
-    # @duracao.setter
-    # def duracao(self, duracao):
-    #     if isinstance(duracao, int):
-    #         self.__duracao = duracao
 
     @property
     def assistido(self):

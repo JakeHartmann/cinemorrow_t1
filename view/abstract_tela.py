@@ -31,6 +31,3 @@ class AbstractTela(ABC):
     @window.setter
     def window(self, window):
         self.__window = window
-
-    def output_texto(self, texto):
-        print(texto)

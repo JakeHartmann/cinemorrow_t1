@@ -125,11 +125,5 @@ class CtrlPessoa():
         self.__tela_pessoa.mostra_lista_pessoas(pessoas)
         self.abre_tela()
 
-    def standby(self):
-        self.__tela_pessoa.output_texto(
-            "\nAperte qualquer tecla para retornar à gerencia de pessoas.")
-        input()
-        self.abre_tela()
-
     def retorna(self):
         self.__ctrl_principal.abre_tela()
